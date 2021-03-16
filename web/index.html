@@ -41,7 +41,7 @@
         document.getElementById("response").value = formatJson(response);
       };
       obj.open(method, path, false);
-      obj.setRequestHeader("Content-Type", "application/json");
+      obj.setRequestHeader("Content-Type", "application/JSON");
       obj.setRequestHeader("Authorization", authtoken);
       obj.send(params);
     }
@@ -164,10 +164,10 @@
         </li>
         <li>
           <a href="javascript:load()">/load</a> This API will load the server&apos;s database with
-          data provided by json text in the response body. The json text must contain an array of users as
+          data provided by JSON text in the response body. The JSON text must contain an array of users as
           defined in the register details in addition to a personID, an array of persons, and an array of events.
-          WARNING: all data from the database is wiped when this is called. The json file will be specified in
-          the body of the request. A example.json file is provided to get you started with loading specific data.
+          WARNING: all data from the database is wiped when this is called. The JSON file will be specified in
+          the body of the request. A example.JSON file is provided to get you started with loading specific data.
           No authorization authtoken is required.
         </li>
         <li>
