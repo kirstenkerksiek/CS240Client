@@ -4,7 +4,6 @@ import DataAccessObjects.DataAccessException;
 import DataAccessObjects.Database;
 import Model.AuthToken;
 import Model.Event;
-import Model.Person;
 import Requests.AllEventsRequest;
 import Results.AllEventsResult;
 import Results.AllPersonResult;

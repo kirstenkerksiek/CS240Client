@@ -50,6 +50,9 @@ public class UserDao {
      * @throws DataAccessException
      */
     public User find(String username) throws DataAccessException {
+        if (username == null) {
+            throw new DataAccessException("username is null");
+        }
         User user;
         ResultSet rs = null;
         String sql = "SELECT * FROM Users WHERE username = ?;";

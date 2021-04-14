@@ -57,6 +57,9 @@ public class EventDao {
         Event event;
         ResultSet rs = null;
         String sql = "SELECT * FROM Events WHERE EventID = ?;";
+        if(eventID == null) {
+            sql = null;
+        }
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, eventID);
             rs = stmt.executeQuery();
@@ -87,6 +90,9 @@ public class EventDao {
         ArrayList<Event> events = new ArrayList<>();
         ResultSet rs = null;
         String sql = "SELECT * FROM Events WHERE personID = ?;";
+        if(personID == null) {
+            sql = null;
+        }
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, personID);
             rs = stmt.executeQuery();
@@ -127,6 +133,9 @@ public class EventDao {
 
     public void deleteEventsByUsername(String username) throws DataAccessException {
         String sql = "DELETE FROM Events WHERE Username = ?;";
+        if (username == null) {
+            sql = null;
+        }
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
             stmt.executeUpdate();
@@ -140,6 +149,9 @@ public class EventDao {
         ArrayList<Event> events = new ArrayList<>();
         ResultSet rs = null;
         String sql = "SELECT * FROM Events WHERE Username = ?;";
+        if (username == null) {
+            sql = null;
+        }
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
             rs = stmt.executeQuery();

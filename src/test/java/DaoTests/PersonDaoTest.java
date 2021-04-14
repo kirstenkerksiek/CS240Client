@@ -29,8 +29,8 @@ public class PersonDaoTest {
         //lets create a new database
         db = new Database();
         //and a new event with random data
-        bestPerson = new Person("0000000c", "testuser", "abby", "smith", "f", "0000000a", "0000000b", "0000000d");
-        worstPerson = new Person("0000000x", "testuser", "abby", "smith", "f", "0000000y", "0000000z", "null");
+        bestPerson = new Person("0000000c", "testuser", "abby", "smith", "f", "2", "3", "4");
+        worstPerson = new Person("0000000x", "testuser", "abby", "smith", "f", "5", "6", "null");
         //Here, we'll open the connection in preparation for the test case to use it
         Connection conn = db.getConnection();
         //Let's clear the database as well so any lingering data doesn't affect our tests
@@ -88,15 +88,26 @@ public class PersonDaoTest {
         pDao.insert(bestPerson);
         Person foundUser = pDao.find("abcdef");
         assertNull(foundUser);
+        assertThrows(DataAccessException.class, ()-> pDao.find(null), "importing a null string didn't throw an exception.");
     }
 
     @Test
     public void posUpdate() throws DataAccessException {
         pDao.insert(bestPerson);
-        Person mom = new Person("000d","testuser", "Mary", "Smith", "f", null, null, null);
-        pDao.update("Mother", "000d", "0000000c");
-        String bestPersonWithMom = pDao.find("0000000c").getMotherID();
-        assertEquals(bestPersonWithMom, "000d");
+        Person mom = new Person("momID","testuser", "Mary", "Smith", "f", null, null, null);
+        pDao.update("Mother", "momID", "0000000c");
+        String bestPersonMotherID = pDao.find("0000000c").getMotherID();
+        assertEquals(bestPersonMotherID, "momID", "failed mom update");
+
+        Person dad = new Person("dadID","testuser", "Hyrum", "Smith", "m", null, null, null);
+        pDao.update("Father", "dadID", "0000000c");
+        String bestPersonFatherID = pDao.find("0000000c").getFatherID();
+        assertEquals(bestPersonFatherID, "dadID", "failed dad update");
+
+        Person spouse = new Person("spouseID","testuser", "Harry", "Smith", "m", null, null, null);
+        pDao.update("Spouse", "spouseID", "0000000c");
+        String bestPersonSpouseID = pDao.find("0000000c").getSpouseID();
+        assertEquals(bestPersonSpouseID, "spouseID", "failed spouse update");
     }
 
     @Test
@@ -106,6 +117,11 @@ public class PersonDaoTest {
         pDao.update("Mother", "000d", "0000000w");
         String worstPersonWithWrongParent = pDao.find("0000000x").getFatherID();
         assertNotEquals(worstPersonWithWrongParent, "000d");
+
+        pDao.insert(bestPerson);
+        Person badMom = new Person("momID","testuser", "Mary", "Smith", "f", null, null, null);
+        assertThrows(NullPointerException.class, ()-> pDao.update("Mom", "momID", "0000000c"), "importing a null string didn't throw an exception.");
+
     }
 
     @Test
@@ -117,17 +133,22 @@ public class PersonDaoTest {
 
     @Test
     public void posDelete() throws DataAccessException {
-        Person p1 = new Person("abc", "kirsten", "kirsten", "kerksiek", "f", null, null, null);
-        Person p2 = new Person("def", "kirsten", "katanya", "kerksiek", "f", null, null, null);
-        Person p3 = new Person("ghi", "kirsten", "kielle", "kerksiek", "f", null, null, null);
-        Person p4 = new Person("xyz", "jacob", "jacob", "michael", "m", null, null, null);
+        Person p0 = new Person("rst", "jacob", "mckay", "michael", "f", "3", "2", "1");
+        Person p1 = new Person("abc", "kirsten", "kirsten", "kerksiek", "f", "mom", "dad", "hubby");
+        Person p2 = new Person("def", "kirsten", "katanya", "kerksiek", "f", "mom", "dad", "husband");
+        Person p3 = new Person("ghi", "kirsten", "kielle", "kerksiek", "f", "mom", "dad", "spouse");
+        Person p4 = new Person("xyz", "jacob", "jacob", "michael", "m", "3", "2", "1");
         pDao.insert(p1);
         pDao.insert(p2);
         pDao.insert(p3);
         pDao.insert(p4);
+        pDao.insert(p0);
         pDao.deletePersonsByUsername("kirsten");
-
-        assertEquals(pDao.findPersons("jacob").length, 1);
+        assertEquals(pDao.findPersons("jacob").length, 2, "lengths don't match");
+        Person personJacob = pDao.findPersons("jacob")[0];
+        assertEquals(personJacob, p4, "the first elements are not equal");
+        Person personMcKay = pDao.findPersons("jacob")[1];
+        assertEquals(personJacob, p4, "the second elements are not equal");
     }
 
     @Test
@@ -146,17 +167,18 @@ public class PersonDaoTest {
 
     @Test
     public void posFindPersons() throws DataAccessException {
-        Person p1 = new Person("abc", "kirsten", "kirsten", "kerksiek", "f", null, null, null);
-        Person p2 = new Person("def", "kirsten", "katanya", "kerksiek", "f", null, null, null);
-        Person p3 = new Person("ghi", "kirsten", "kielle", "kerksiek", "f", null, null, null);
-        Person p4 = new Person("xyz", "jacob", "jacob", "michael", "m", null, null, null);
+        Person p1 = new Person("abc", "kirsten", "kirsten", "kerksiek", "f", "dad", "mom", "123");
+        Person p2 = new Person("def", "kirsten", "katanya", "kerksiek", "f", "dad", "mom", "121");
+        Person p3 = new Person("ghi", "kirsten", "kielle", "kerksiek", "f", "dad", "mom", "122");
+        Person p4 = new Person("xyz", "jacob", "jacob", "michael", "m", "dad", "mom", "124");
         pDao.insert(p1);
         pDao.insert(p2);
         pDao.insert(p3);
         pDao.insert(p4);
         Person[] persons = pDao.findPersons("kirsten");
-
         assertEquals(persons.length, 3);
+        Person[] expected = new Person[] {p1, p2, p3};
+        assertArrayEquals(expected, persons);
     }
 
     @Test
@@ -171,6 +193,7 @@ public class PersonDaoTest {
         pDao.insert(p4);
         Person[] persons = pDao.findPersons("katanya");
         assertNull(persons);
+        assertThrows(NullPointerException.class, ()-> pDao.findPersons(null));
     }
 }
 

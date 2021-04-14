@@ -91,8 +91,7 @@ public class UserDaoTest {
         uDao.insert(bestUser);
         User foundUser = uDao.find("abcdef");
         assertNull(foundUser);
-        Person person = new Person("abc", "username", "jo", "smith", "m", null, null, null);
-        assertThrows(DataAccessException.class, ()-> uDao.find(person.getFatherID()), "importing a null string didn't throw an exception.");
+        assertThrows(DataAccessException.class, ()-> uDao.find(null), "importing a null string didn't throw an exception.");
     }
 
     @Test
@@ -103,7 +102,7 @@ public class UserDaoTest {
     }
 
     @Test
-    public void negValid() throws DataAccessException {
+    public void badValid() throws DataAccessException {
         uDao.insert(bestUser);
         boolean validActual = uDao.validUsernameAndPassword(bestUser.getPassword(), bestUser.getUsername());
         assertNotEquals(validActual, true);

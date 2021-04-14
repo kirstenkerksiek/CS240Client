@@ -54,6 +54,9 @@ public class PersonDao {
      * find a person based on a given id
      */
     public Person find(String pID) throws DataAccessException {
+        if(pID == null) {
+            throw new DataAccessException();
+        }
         Person person;
         ResultSet rs = null;
         String sql = "SELECT * FROM Persons WHERE PersonID = ?;";
@@ -93,8 +96,11 @@ public class PersonDao {
             else if (member.equals("Father")) {
                 sql = "UPDATE Persons SET FatherID = ? Where PersonID = ?;";
             }
-            else if (member.equals("Mother")) {
-                sql = "UPDATE Persons SET MotherID = ? Where PersonID = ?;";
+            else if (member.equals("Spouse")) {
+                sql = "UPDATE Persons SET SpouseID = ? Where PersonID = ?;";
+            }
+            else {
+                sql = null;
             }
 
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -113,6 +119,9 @@ public class PersonDao {
 
     public void deletePersonsByUsername(String username) throws DataAccessException {
 
+        if (username == null) {
+            throw new DataAccessException();
+        }
         String sql = "DELETE FROM Persons WHERE Username = ?;";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
@@ -127,6 +136,9 @@ public class PersonDao {
         ArrayList<Person> persons = new ArrayList<>();
         ResultSet rs = null;
         String sql = "SELECT * FROM Persons WHERE Username = ?;";
+        if (username == null) {
+            sql = null;
+        }
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
             rs = stmt.executeQuery();

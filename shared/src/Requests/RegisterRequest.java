@@ -12,7 +12,7 @@ public class RegisterRequest {
     private String lastName;
     private String gender;
 
-    RegisterRequest(){
+    public RegisterRequest(){
         username = null;
         password = null;
         email = null;

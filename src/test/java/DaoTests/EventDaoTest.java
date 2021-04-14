@@ -49,8 +49,8 @@ public class EventDaoTest {
     @Test
     public void findEventsPass() throws DataAccessException {
         Event e1 = new Event("abc", "kirsten", "123", 20, 30, "USA", "Denver", "Birth", 2002);
-        Event e2 = new Event("def", "kirsten", "123", 78, 20, "England", "London", "Marriage", 2025);
-        Event e3 = new Event("ghi", "kirsten", "123", 100, 50, "Australia", "Sydney", "Death", 2080);
+        Event e2 = new Event("def", "cruz", "123", 78, 20, "England", "London", "Marriage", 2025);
+        Event e3 = new Event("ghi", "katanya", "123", 100, 50, "Australia", "Sydney", "Death", 2080);
         Event e4 = new Event("xyz", "kirsten", "321", 100, 50, "Australia", "Sydney", "Birth", 2030);
         Event e5 = new Event("uvw", "kirsten", "789", 56, 10, "Japan", "Tokya", "Death", 2100);
         eDao.insert(e1);
@@ -59,7 +59,13 @@ public class EventDaoTest {
         eDao.insert(e4);
         eDao.insert(e5);
         Event[] actual = eDao.findEvents("kirsten");
-        assertEquals(actual.length, 5);
+        assertEquals(actual.length, 3);
+        Event found1 = e1;
+        Event found2 = e4;
+        Event found3 = e5;
+        assertEquals(found1,actual[0]);
+        assertEquals(found2,actual[1]);
+        assertEquals(found3,actual[2]);
     }
 
     @Test
@@ -74,8 +80,9 @@ public class EventDaoTest {
         eDao.insert(e3);
         eDao.insert(e4);
         eDao.insert(e5);
-        Event[] actual = eDao.getEventsByPerson("Australia");
+        Event[] actual = eDao.findEvents("Australia");
         assertNull(actual);
+        assertThrows(NullPointerException.class, ()-> eDao.findEvents(null));
     }
 
     @Test
@@ -92,6 +99,8 @@ public class EventDaoTest {
         eDao.insert(e5);
         Event[] actual = eDao.getEventsByPerson("123");
         assertEquals(actual.length, 3);
+        Event[] expected = new Event[]{e1, e2, e3};
+        assertArrayEquals(expected, actual);
     }
 
     @Test
@@ -108,6 +117,7 @@ public class EventDaoTest {
         eDao.insert(e5);
         Event[] actual = eDao.getEventsByPerson("abc");
         assertNull(actual);
+        assertThrows(NullPointerException.class, ()-> eDao.getEventsByPerson(null), "importing a null string didn't throw an exception.");
     }
 
 
@@ -124,8 +134,10 @@ public class EventDaoTest {
         eDao.insert(e4);
         eDao.insert(e5);
         eDao.deleteEventsByUsername("skye");
-        Event[] event = eDao.getEventsByPerson("321");
-        assertEquals(event.length, 1);
+        Event[] events = eDao.getEventsByPerson("321");
+        assertEquals(events.length, 1);
+        Event found1 = e3;
+        assertEquals(found1, events[0]);
     }
 
     @Test
@@ -142,6 +154,7 @@ public class EventDaoTest {
         eDao.insert(e5);
         eDao.deleteEventsByUsername("kirsten");
         assertNull(eDao.findEvents("kirsten"));
+        assertThrows(NullPointerException.class, ()-> eDao.deleteEventsByUsername(null), "importing a null string didn't throw an exception.");
     }
 
     @Test
@@ -185,6 +198,7 @@ public class EventDaoTest {
         eDao.insert(bestEvent);
         Event foundEvent = eDao.find("abcdef");
         assertNull(foundEvent);
+        assertThrows(NullPointerException.class, ()-> eDao.find(null), "importing a null string didn't throw an exception.");
     }
 
     @Test

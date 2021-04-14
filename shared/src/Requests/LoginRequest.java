@@ -10,7 +10,7 @@ public class LoginRequest {
     private String username;
     private String password;
 
-    LoginRequest(){
+    public LoginRequest(){
         username = null;
         password = null;
     }

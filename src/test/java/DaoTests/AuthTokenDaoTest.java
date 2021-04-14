@@ -47,24 +47,6 @@ public class AuthTokenDaoTest {
     }
 
     @Test
-    public void negFindUser() throws DataAccessException {
-        User bestUser = new User("user", "password", "email", "kirsten", "kerksiek", "f", "abcdef");
-        AuthToken auth = new AuthToken("abcdef", "user");
-        aDao.insert(auth);
-        //User foundUser = aDao.find("password");
-        //assertNull(foundUser);
-    }
-
-    @Test
-    public void posClear() throws DataAccessException {
-        User bestUser = new User("user", "password", "email", "kirsten", "kerksiek", "f", "abcdef");
-        AuthToken auth = new AuthToken("abcdef", "user");
-        aDao.insert(auth);
-        //aDao.clearTable();
-        //assertNull(aDao.find(bestUser.getUsername()));
-    }
-
-    @Test
     public void posValid() throws DataAccessException {
         User bestUser = new User("user", "password", "email", "kirsten", "kerksiek", "f", "abcdef");
         AuthToken auth = new AuthToken("abcdef", "user");
@@ -81,6 +63,7 @@ public class AuthTokenDaoTest {
         AuthToken bad = new AuthToken("abcdef", "evil");
         boolean validActual = aDao.isValidAuth(bad);
         assertNotEquals(validActual, false);
+        assertThrows(NullPointerException.class, ()-> aDao.isValidAuth(null), "importing a null string didn't throw an exception.");
     }
 
     @Test
@@ -90,5 +73,37 @@ public class AuthTokenDaoTest {
         aDao.insert(auth);
         String username = aDao.getUsername(auth);
         assertEquals(bestUser.getUsername(), username);
+    }
+
+    @Test
+    public void negGetUsername() throws DataAccessException {
+        //tests with a null value
+        assertThrows(NullPointerException.class, ()-> aDao.getUsername(null), "importing a null string didn't throw an exception.");
+    }
+
+    @Test
+    public void insertPass() throws DataAccessException {
+        AuthToken auth = new AuthToken("123456", "user1");
+        //While insert returns a bool we can't use that to verify that our function actually worked
+        //only that it ran without causing an error
+        aDao.insert(auth);
+        //So lets use a find method to get the event that we just put in back out
+        String compareTest = aDao.getUsername(auth);
+        //First lets see if our find found anything at all. If it did then we know that if nothing
+        //else something was put into our database, since we cleared it in the beginning
+        assertNotNull(compareTest);
+        //Now lets make sure that what we put in is exactly the same as what we got out. If this
+        //passes then we know that our insert did put something in, and that it didn't change the
+        //data in any way
+        assertEquals(auth.getUsername(), compareTest);
+    }
+
+    @Test
+    public void insertFail() throws DataAccessException {
+        AuthToken auth = new AuthToken("123456", "user1");
+        //lets do this test again but this time lets try to make it fail
+        //if we call the method the first time it will insert it successfully
+        aDao.insert(auth);
+        assertThrows(NullPointerException.class, ()-> aDao.insert(null));
     }
 }
